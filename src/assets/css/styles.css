@@ -1,13 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@400;700&display=swap');
+
 :root {
     --baseline: 20px;
-    --baselinephi: calc(1.618*var(--baseline));
-    --baselineihp: calc(0.618*var(--baseline));
+    --baselinephi: calc(1.618 * var(--baseline));
+    --baselineihp: calc(0.618 * var(--baseline));
+}
+
+body {
+    background-color: #F7FAFC;
 }
 
 * {
     box-sizing: border-box;
-    font-family: "SF Pro Display", sans-serif;
+    font-family: "Merriweather Sans", sans-serif;
     cursor: default;
+    transition: all 0.3s ease-in-out;
+    color: #4A5568;
 }
 
 .hidden {
@@ -20,26 +28,35 @@ ul {
 }
 
 .content {
-    margin: calc(2*var(--baseline));
+    border-radius: var(--baselinephi);
+    margin: calc(2 * var(--baseline));
     display: grid;
-    background-color: yellowgreen;
+    background-color: #EDF2F7;
+    box-shadow: 0px 10px 34px -4px rgba(0,0,0,0.21);
     grid-template-areas: 'header header header header header' 'nav lib lib lib lib' 'footer footer footer footer footer';
 }
 
 header {
     padding-left: var(--baselinephi);
+    border-radius: var(--baselinephi) var(--baselinephi) 0 0;
+    height: 81px;
     grid-area: header;
     justify-content: space-between;
-    background-color: chartreuse;
+    background-color: #718096;
     display: flex;
 }
+
 /*
 NAVIGATION SIDEBAR
  */
 nav {
     grid-area: nav;
-    background-color: bisque;
+    background-color: #E2E8F0;
     max-width: 250px;
+}
+
+nav li {
+    cursor: pointer;
 }
 
 nav ul li {
@@ -47,8 +64,13 @@ nav ul li {
     padding: 5px var(--baselinephi);
 }
 
+h1 {
+    color: #F7FAFC;
+}
+
 .nav-selected {
-    background-color: sienna;
+    background-color: #A0AEC0;
+    color : #2D3748;
 }
 
 /*
@@ -57,31 +79,36 @@ SECTION
 
 .library {
     grid-area: lib;
-    background-color: brown;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-gap:var(--baselinephi);
+    grid-gap: var(--baselinephi);
     padding: var(--baselinephi);
 }
 
 .book {
     margin: 0;
     padding: 0 var(--baseline) var(--baseline) var(--baseline);
-    background-color: bisque;
+    background-color: #E2E8F0;
     border-radius: var(--baselineihp);
+    box-shadow: 0px 10px 34px -4px rgba(0,0,0,0.15);
+}
+
+.book:hover {
+    box-shadow: 0px 10px 34px -4px rgba(0,0,0,0.3);
 }
 
 .book-read > .book-menu {
-    background-color: sienna;
+    background-color: #718096;
 }
+
 
 .book-menu {
     display: flex;
     width: calc(100% + 2 * var(--baseline));
     justify-content: flex-end;
     margin-bottom: var(--baselineihp);
-    transform: translate(calc(-1*var(--baseline)));
-    background-color: chartreuse;
+    transform: translate(calc(-1 * var(--baseline)));
+    background-color: #CBD5E0;
     padding: var(--baselineihp);
     border-radius: var(--baselineihp) var(--baselineihp) 0 0;
 }
@@ -91,6 +118,18 @@ SECTION
     height: 35px;
     width: 35px;
     border-radius: 35px;
+    border: none;
+    color: #A0AEC0;
+    background-color: #F7FAFC;
+    cursor: pointer;
+}
+
+.book-read .menu-option {
+    color: #718096;
+}
+
+.menu-option * {
+    cursor: pointer;
 }
 
 .book-option {
@@ -105,18 +144,46 @@ SECTION
     justify-content: flex-end;
 }
 
+.btn-wrapper button {
+    background-color: #F7FAFC;
+}
+
 .btn-wrapper > *,
 .save-btn-wrapper > * {
     width: 75px;
     height: 75px;
     border-radius: 75px;
+    border: none;
+}
+
+.btn-wrapper:hover > *,
+.save-btn-wrapper:hover > * {
+    box-shadow: 0px 10px 34px -4px rgba(0,0,0,0.35);
+}
+
+.save-btn-wrapper > *{
+    margin: auto 6px auto auto;
+    width: 65px;
+    height: 65px;
+    color: #A0AEC0;
+    background-color: #F7FAFC;
+    cursor: pointer;
+}
+
+.save-btn-wrapper i {
+    cursor: pointer;
+}
+
+.btn-wrapper button {
+    background-color: #718096;
+    color: #F3FAFC;
 }
 
 *[contenteditable="true"] {
-    background-color: yellow;
+    background-color: #A0AEC0;
 }
 
-.hidden  {
+.hidden   {
     display: none;
 }
 
@@ -126,11 +193,13 @@ FOOTER
 
 footer {
     grid-area: footer;
-    background-color: sienna;
+    background-color: #718096;
     padding: 15px 15px 15px var(--baselinephi);
+    border-radius: 0 0 var(--baselineihp) var(--baselineihp);
+
 }
 
-@media screen and (max-width: 1368px){
+@media screen and (max-width: 1368px) {
     .library {
         grid-template-columns: repeat(3, 1fr);
     }
