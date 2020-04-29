@@ -3,6 +3,26 @@ import {get, createNewBook} from "./controller";
 import * as Cookies from 'js-cookie';
 import {Book} from "./book";
 
+import * as firebase from "firebase/app";
+
+import "firebase/analytics";
+
+
+var firebaseConfig = {
+    apiKey: "AIzaSyCu3Rk4xw-y-zrsTT6zgndnY2q5A1AbDNU",
+    authDomain: "basic-library-manager.firebaseapp.com",
+    databaseURL: "https://basic-library-manager.firebaseio.com",
+    projectId: "basic-library-manager",
+    storageBucket: "basic-library-manager.appspot.com",
+    messagingSenderId: "764501044227",
+    appId: "1:764501044227:web:ef6c4a635d8c7c8be1f236",
+    measurementId: "G-PMC4Y82298"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+
+
 /*
 LIBRARY JS OBJECT
  */

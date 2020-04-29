@@ -19,6 +19,7 @@
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
+    "firebase": "^7.14.2",
     "js-cookie": "^2.2.1"
   }
 }
