@@ -29,13 +29,14 @@ function writeData() {
 }
 
 let libraryFirebaseBuffer = {idCounter:0,books:[]};
-window.fire = libraryFirebaseBuffer;
 
 function getData() {
     firebase.database().ref("Library").once('value').then(function (snapshot) {
-        libraryFirebaseBuffer.idCounter = snapshot.val().idCounter;
         let booksFirebase = JSON.parse(snapshot.val().books);
-        booksFirebase.forEach((book) => libraryFirebaseBuffer.books.push(book));
+        let maxIdCounter = snapshot.val().idCounter;
+        booksFirebase.forEach((book) => {libraryFirebaseBuffer.books.push(book);maxIdCounter = Math.max(maxIdCounter,book.id)});
+        libraryFirebaseBuffer.idCounter = maxIdCounter;
+        library.idCounter = (libraryFirebaseBuffer.idCounter !== null) ? libraryFirebaseBuffer.idCounter : 0;
     })
 }
 
@@ -45,9 +46,6 @@ LIBRARY JS OBJECT
 
 // Local library.
 const library = {
-    /*
-        idCounter: (parseInt(Cookies.get('id'))) ? parseInt(Cookies.get('id')) : 0,
-    */
     idCounter: (libraryFirebaseBuffer.idCounter !== null) ? libraryFirebaseBuffer.idCounter : 0,
     books: [],
     getBook: (id) => {
@@ -61,7 +59,6 @@ const library = {
 // Filling the books from Firebase.
 const render = () => {
     const booksCookies = (libraryFirebaseBuffer.books) ? libraryFirebaseBuffer.books.slice() : [];
-    console.log(booksCookies);
     if (!booksCookies) {
         return;
     }
@@ -307,5 +304,6 @@ headerDOM.addEventListener("click", (e) => {
 )
 
 getData();
+// Local library.
+
 setTimeout(render,1000);
-window.library = library;
