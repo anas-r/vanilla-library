@@ -4,9 +4,8 @@ import * as Cookies from 'js-cookie';
 import {Book} from "./book";
 
 import * as firebase from "firebase/app";
-
-import "firebase/analytics";
-
+import "firebase/auth";
+import "firebase/database";
 
 var firebaseConfig = {
     apiKey: "AIzaSyCu3Rk4xw-y-zrsTT6zgndnY2q5A1AbDNU",
@@ -20,8 +19,25 @@ var firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-firebase.analytics();
 
+// Firebase write data.
+function writeData() {
+    firebase.database().ref("Library").set({
+        idCounter: library.idCounter,
+        books: JSON.stringify(library.books),
+    })
+}
+
+let libraryFirebaseBuffer = {idCounter:0,books:[]};
+window.fire = libraryFirebaseBuffer;
+
+function getData() {
+    firebase.database().ref("Library").once('value').then(function (snapshot) {
+        libraryFirebaseBuffer.idCounter = snapshot.val().idCounter;
+        let booksFirebase = JSON.parse(snapshot.val().books);
+        booksFirebase.forEach((book) => libraryFirebaseBuffer.books.push(book));
+    })
+}
 
 /*
 LIBRARY JS OBJECT
@@ -29,7 +45,10 @@ LIBRARY JS OBJECT
 
 // Local library.
 const library = {
-    idCounter: (parseInt(Cookies.get('id'))) ? parseInt(Cookies.get('id')) : 0,
+    /*
+        idCounter: (parseInt(Cookies.get('id'))) ? parseInt(Cookies.get('id')) : 0,
+    */
+    idCounter: (libraryFirebaseBuffer.idCounter !== null) ? libraryFirebaseBuffer.idCounter : 0,
     books: [],
     getBook: (id) => {
         return library.books.filter(book => parseInt(book.id) === parseInt(id))[0]
@@ -39,8 +58,30 @@ const library = {
     }
 }
 
-// Filling the books from local storage.
+// Filling the books from Firebase.
 const render = () => {
+    const booksCookies = (libraryFirebaseBuffer.books) ? libraryFirebaseBuffer.books.slice() : [];
+    console.log(booksCookies);
+    if (!booksCookies) {
+        return;
+    }
+    booksCookies.forEach((bookOBJECT) => {
+            // Local library.
+            const newBook = createNewBook(bookOBJECT);
+            library.books.push(newBook);
+            // DOM.
+            libraryDOM.insertAdjacentHTML("beforeend", bookTemplateNoButton(bookOBJECT));
+        }
+    )
+    libraryDOM.insertAdjacentHTML('beforeend',
+        `
+                <div class="btn-wrapper">
+            <button><i class="las la-plus la-2x"></i></button>
+        </div>`)
+}
+
+// Filling the books from local storage.
+/*const render = () => {
     const booksCookies = JSON.parse((Cookies.get('books')) ? (Cookies.get('books')) : "[]");
     if (!booksCookies) {
         return;
@@ -58,7 +99,7 @@ const render = () => {
                 <div class="btn-wrapper">
             <button><i class="las la-plus la-2x"></i></button>
         </div>`)
-};
+};*/
 
 /*
 DOM Constants
@@ -73,13 +114,13 @@ const bookTemplate = (id) => {
     return `
                 <ul class="book" id="book-${id}">
             <li class="book-menu">
-                <button class="menu-option btn-edit">
+                <button class="menu-option btn-edit" title="Edit book details">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="menu-option btn-read">
+                <button class="menu-option btn-read" title="Declare book read">
                     <i class="fas fa-star"></i>
                 </button>
-                <button class="menu-option btn-delete">
+                <button class="menu-option btn-delete" title="Delete book">
                     <i class="fas fa-trash"></i>
                 </button>
             </li>
@@ -102,15 +143,15 @@ const bookTemplateNoButton = (bookOBJECT) => {
     return `
         <ul class="book ${isRead}" id="book-${bookOBJECT.id}">
     <li class="book-menu">
-    <button class="menu-option btn-edit">
-    <i class="fas fa-edit"></i>
-    </button>
-    <button class="menu-option btn-read">
-    <i class="fas fa-star"></i>
-    </button>
-    <button class="menu-option btn-delete">
-    <i class="fas fa-trash"></i>
-    </button>
+                   <button class="menu-option btn-edit" title="Edit book details">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="menu-option btn-read" title="Declare book read">
+                    <i class="fas fa-star"></i>
+                </button>
+                <button class="menu-option btn-delete" title="Delete book">
+                    <i class="fas fa-trash"></i>
+                </button>
     </li>
 Title
 <li class="book-option book-title">${bookOBJECT.title}</li>
@@ -251,14 +292,20 @@ libraryDOM.addEventListener("click", (e) => {
 
 // Saving our library (cookies).
 headerDOM.addEventListener("click", (e) => {
-        const saveAllBTN = e.target.closest('.save-btn-wrapper');
+        const saveAllBTN = e.target.closest('.save');
         if (!saveAllBTN) {
             return;
         }
         Cookies.set("id", library.idCounter);
         Cookies.set("books", JSON.stringify(library.books));
+
+        // Saving to Firebase.
+        writeData();
+        getData();
+
     }
 )
 
-render();
+getData();
+setTimeout(render,1000);
 window.library = library;
