@@ -221,7 +221,17 @@ footer {
     }
 }
 
+@media screen and (max-width: 768px){
+    .content {
+        grid-template-areas: 'header' 'nav' 'lib' 'footer';
+    }
+}
+
 @media screen and (max-width: 600px) {
+    h1 {
+        display: none;
+    }
+
     .library {
         grid-template-columns: repeat(1, 1fr);
     }
