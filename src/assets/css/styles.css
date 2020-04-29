@@ -10,11 +10,11 @@
     --light-menu: #E2E8F0;
     --light-bg: #EDF2F7;
     --light-icons: #A0AEC0;
-
 }
 
 body {
     background-color: var(--light-bg);
+    margin: 0;
 }
 
 * {
