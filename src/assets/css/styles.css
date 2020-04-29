@@ -62,7 +62,6 @@ NAVIGATION SIDEBAR
 nav {
     grid-area: nav;
     background-color: var(--light-menu);
-    max-width: 250px;
 }
 
 nav li {
