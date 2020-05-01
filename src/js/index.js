@@ -28,25 +28,29 @@ function writeData() {
     })
 }
 
-let libraryFirebaseBuffer = {idCounter:0,books:[]};
-
 function getData() {
-    firebase.database().ref("Library").once('value').then(function (snapshot) {
-        let booksFirebase = JSON.parse(snapshot.val().books);
-        let maxIdCounter = snapshot.val().idCounter;
-        booksFirebase.forEach((book) => {libraryFirebaseBuffer.books.push(book);maxIdCounter = Math.max(maxIdCounter,book.id)});
-        libraryFirebaseBuffer.idCounter = maxIdCounter;
-        library.idCounter = (libraryFirebaseBuffer.idCounter !== null) ? libraryFirebaseBuffer.idCounter : 0;
-    })
+    firebase.database().ref("Library").once('value')
+        .then(function (snapshot) {
+            let idCounter = parseInt(snapshot.val().idCounter);
+            let books = JSON.parse(snapshot.val().books);
+            if (!(snapshot && idCounter && books)) {
+                throw new Error();
+            }
+            return {idCounter, books}
+        })
+        .then(render)
+        .catch(() => {
+             render({idCounter: 0, books: []});
+        })
 }
 
 /*
 LIBRARY JS OBJECT
  */
 
-// Local library.
+// Local library initializing.
 const library = {
-    idCounter: (libraryFirebaseBuffer.idCounter !== null) ? libraryFirebaseBuffer.idCounter : 0,
+    idCounter: 0,
     books: [],
     getBook: (id) => {
         return library.books.filter(book => parseInt(book.id) === parseInt(id))[0]
@@ -57,22 +61,23 @@ const library = {
 }
 
 // Filling the books from Firebase.
-const render = () => {
-    const booksCookies = (libraryFirebaseBuffer.books) ? libraryFirebaseBuffer.books.slice() : [];
-    if (!booksCookies) {
-        return;
-    }
-    booksCookies.forEach((bookOBJECT) => {
+const render = (libraryFirebaseBuffer) => {
+    // Library idCounter set.
+    library.idCounter = libraryFirebaseBuffer.idCounter;
+    // Library books set.
+    const booksBuffer = libraryFirebaseBuffer.books.slice();
+    booksBuffer.forEach((bookOBJECT) => {
             // Local library.
-            const newBook = createNewBook(bookOBJECT);
-            library.books.push(newBook);
+            const newBookProxy = createNewBook(bookOBJECT);
+            library.books.push(newBookProxy);
             // DOM.
             libraryDOM.insertAdjacentHTML("beforeend", bookTemplateNoButton(bookOBJECT));
         }
     )
+    // Insertion into the DOM.
     libraryDOM.insertAdjacentHTML('beforeend',
         `
-                <div class="btn-wrapper">
+        <div class="btn-wrapper">
             <button><i class="las la-plus la-2x"></i></button>
         </div>`)
 }
@@ -293,17 +298,15 @@ headerDOM.addEventListener("click", (e) => {
         if (!saveAllBTN) {
             return;
         }
-        Cookies.set("id", library.idCounter);
-        Cookies.set("books", JSON.stringify(library.books));
+/*        Cookies.set("id", library.idCounter);
+        Cookies.set("books", JSON.stringify(library.books));*/
 
         // Saving to Firebase.
         writeData();
-        getData();
 
+        // Refreshing the page.
     }
 )
 
 getData();
 // Local library.
-
-setTimeout(render,1000);
