@@ -28,7 +28,8 @@ function writeData() {
     })
 }
 
-function getData() {
+// Fetch data.
+function fetchData() {
     firebase.database().ref("Library").once('value')
         .then(function (snapshot) {
             let idCounter = parseInt(snapshot.val().idCounter);
@@ -106,6 +107,7 @@ const render = (libraryFirebaseBuffer) => {
 /*
 DOM Constants
  */
+
 
 const navbarDOM = document.querySelector('nav');
 const libraryDOM = document.querySelector('.library');
@@ -308,5 +310,5 @@ headerDOM.addEventListener("click", (e) => {
     }
 )
 
-getData();
+fetchData();
 // Local library.
